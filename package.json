@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "ts-node-dev src/index.ts",
     "start": "node build/index.js",
-    "build": "tsc",
     "tsc": "tsc",
     "test": "echo \"No test specified\""
   },
