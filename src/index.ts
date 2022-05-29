@@ -9,16 +9,16 @@ app.use(express.json());
 const wss = new WebSocket.Server({ server });
 const PORT = process.env.PORT || 3001
 
-const getISS = (_: any, res : any) =>  {
+/*const getISS = (_: any, res : any) =>  {
     const optionalTimestampMS = +new Date;//1502342329860;
     const latLonObj = getLatLngObj(tle, optionalTimestampMS);
     const finalObject = {...latLonObj, timestamp: optionalTimestampMS};
     //getTXT();
     res.send(finalObject);
 }
+*/
 
-
-var tles :TLELocal[] = [];
+//var tles :TLELocal[] = [];
 
 const tle = `ISS (ZARYA) 
 1 44713C 19074A   22137.44061460  .00004673  00000-0  31310-3 0  1375 
@@ -27,14 +27,14 @@ const tle = `ISS (ZARYA)
 //ISS (ZARYA)
 // 1 25544U 98067A   22138.48291186  .00009938  00000-0  18505-3 0  9996
 // 2 25544  51.6428 123.6928 0004981 131.9577  12.1536 15.49498859340573
-
+/*
 type TLELocal= {
     name: string;
     line1: string;
     line2: string;
-  };
+  };*/
 
-async function getTXT() 
+/*async function getTXT() 
 {
     console.log("getTXT");
     const response = await fetch('https://celestrak.com/NORAD/elements/supplemental/starlink.txt');
@@ -52,26 +52,27 @@ async function getTXT()
         }
     }
     tles = tleLocalList;
-    
     return tleLocalList;
-}
+}*/
 
 
-const getTLEs = async (_: any, res : any) => {
+/*const getTLEs = async (_: any, res : any) => {
     var data : TLELocal[]= await getTXT();
     console.log(tles.length);
     res.send(data);
 }
-
-
-
-
+*/
 //#region Endpoints
 app.get('/', (_, res) => {
-    return res.send("OK");
+    res.send("OK");
   });
-app.get('/getISS', getISS);
-app.get('/getTLEs',getTLEs);
+app.get('/getISS', (_req, res) => {
+    const optionalTimestampMS = +new Date;//1502342329860;
+    const latLonObj = getLatLngObj(tle, optionalTimestampMS);
+    const finalObject = {...latLonObj, timestamp: optionalTimestampMS};
+    res.send(finalObject);
+});
+//app.get('/getTLEs',getTLEs);
 
 
 //#endregion

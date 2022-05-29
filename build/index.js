@@ -22,15 +22,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -44,49 +35,64 @@ const server = http.createServer(app);
 app.use(express_1.default.json());
 const wss = new WebSocket.Server({ server });
 const PORT = process.env.PORT || 3001;
-const getISS = (_, res) => {
-    const optionalTimestampMS = +new Date; //1502342329860;
+/*const getISS = (_: any, res : any) =>  {
+    const optionalTimestampMS = +new Date;//1502342329860;
     const latLonObj = getLatLngObj(tle, optionalTimestampMS);
-    const finalObject = Object.assign(Object.assign({}, latLonObj), { timestamp: optionalTimestampMS });
+    const finalObject = {...latLonObj, timestamp: optionalTimestampMS};
     //getTXT();
     res.send(finalObject);
-};
-var tles = [];
+}
+*/
+//var tles :TLELocal[] = [];
 const tle = `ISS (ZARYA) 
 1 44713C 19074A   22137.44061460  .00004673  00000-0  31310-3 0  1375 
 2 44713  53.0533 316.6557 0001484  70.9551 312.7346 15.06394731    13`;
-function getTXT() {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log("getTXT");
-        const response = yield fetch('https://celestrak.com/NORAD/elements/supplemental/starlink.txt');
-        const data = yield response.text();
-        var array = data.toString().split('\n');
-        let tleLocalList = [];
-        for (var i = 0; i < array.length; i = i + 3) {
-            if (array[i].length > 0) {
-                var tle_local = {
-                    name: array[i].replace('\r', '').trimEnd(),
-                    line1: array[i + 1].replace('\r', '').trimEnd(),
-                    line2: array[i + 2].replace('\r', '').trimEnd()
-                };
-                tleLocalList.push(tle_local);
+//ISS (ZARYA)
+// 1 25544U 98067A   22138.48291186  .00009938  00000-0  18505-3 0  9996
+// 2 25544  51.6428 123.6928 0004981 131.9577  12.1536 15.49498859340573
+/*
+type TLELocal= {
+    name: string;
+    line1: string;
+    line2: string;
+  };*/
+/*async function getTXT()
+{
+    console.log("getTXT");
+    const response = await fetch('https://celestrak.com/NORAD/elements/supplemental/starlink.txt');
+    const data = await response.text();
+    var array: string[] = data.toString().split('\n');
+    let tleLocalList: TLELocal[] = [];
+    for (var i = 0; i < array.length; i = i + 3) {
+        if (array[i].length>0){
+            var tle_local: TLELocal = {
+                name: array[i].replace('\r', '').trimEnd(),
+                line1: array[i + 1].replace('\r', '').trimEnd(),
+                line2: array[i + 2].replace('\r', '').trimEnd()
             }
+            tleLocalList.push(tle_local);
         }
-        tles = tleLocalList;
-        return tleLocalList;
-    });
-}
-const getTLEs = (_, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var data = yield getTXT();
+    }
+    tles = tleLocalList;
+    return tleLocalList;
+}*/
+/*const getTLEs = async (_: any, res : any) => {
+    var data : TLELocal[]= await getTXT();
     console.log(tles.length);
     res.send(data);
-});
+}
+*/
 //#region Endpoints
 app.get('/', (_, res) => {
-    return res.send("OK");
+    res.send("OK");
 });
-app.get('/getISS', getISS);
-app.get('/getTLEs', getTLEs);
+app.get('/getISS', (_req, res) => {
+    const optionalTimestampMS = +new Date; //1502342329860;
+    const latLonObj = getLatLngObj(tle, optionalTimestampMS);
+    const finalObject = Object.assign(Object.assign({}, latLonObj), { timestamp: optionalTimestampMS });
+    res.send(finalObject);
+});
+//app.get('/getTLEs',getTLEs);
 //#endregion
 //#region Websocket
 wss.on('connection', (ws) => {
